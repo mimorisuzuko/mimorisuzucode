@@ -1,0 +1,27 @@
+{
+  "name": "mimorisuzucode",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron ."
+  },
+  "keywords": [],
+  "author": "Hiroki Usuba <hrky0206@gmail.com> (http://mimorisuzuko.github.io/)",
+  "license": "MIT",
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-notify": "^2.2.0",
+    "gulp-plumber": "^1.1.0",
+    "gulp-pug": "^3.0.4",
+    "gulp-sass": "^2.3.2"
+  },
+  "dependencies": {
+    "@mimorisuzuko/m": "0.0.1",
+    "co": "^4.6.0",
+    "lodash": "^4.15.0",
+    "node-twitter-api": "^1.8.0",
+    "twitter": "^1.4.0"
+  }
+}

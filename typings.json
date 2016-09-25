@@ -1,0 +1,9 @@
+{
+  "globalDependencies": {
+    "electron": "registry:env/electron#0.37.6+20160909065630",
+    "node": "registry:env/node#6.0.0+20160902022231"
+  },
+  "dependencies": {
+    "lodash": "registry:npm/lodash#4.0.0+20160723033700"
+  }
+}

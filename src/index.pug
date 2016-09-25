@@ -1,0 +1,70 @@
+doctype html
+html
+	head
+		title Mimori Suzu Code
+		meta(charset='utf-8')
+		link(rel='stylesheet' href='https://cdn.materialdesignicons.com/1.7.22/css/materialdesignicons.min.css')
+		link(rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css')
+		link(rel='stylesheet' href='index.css')
+	body
+		main
+			div.notification
+				div.nt-left
+					span.nt-type
+					span.nt-message
+				div.nt-right
+					a.nt-button close
+			div.navbar
+				ul
+					li.current.nv-file.current(data-index='0')
+						i.fa.fa-files-o(aria-hidden='true')
+					li.nv-twitter(data-index='1')
+						i.fa.fa-twitter(aria-hidden='true')
+			div.sidebar
+				div.sb-explorer.sb-item.current
+					div.sb-header explorer
+					div.sb-sub-header.selected(data-target='.sb-editor-tree')
+						span.sb-wrap-icon
+							i.fa.fa-caret-right(aria-hidden='true')
+						|open editors
+					div.sb-editor-tree
+						ul
+					ul.sb-files
+					div.sb-sub-header.sb-dirname-header.selected(data-target='.sb-directory-tree')
+						span.sb-wrap-icon
+							i.fa.fa-caret-right(aria-hidden='true')
+						span.sb-dirname no folder opened
+					div.sb-directory-tree
+						ul
+				div.sb-twitter.sb-item
+					div.sb-header twitter
+					div.sb-twitter-content
+						p This text isn't yet tweeted on your account.
+						center
+							img.twitter-icon
+							p
+								span.twitter-name 
+								br
+								span.twitter-screen-name
+						a.sb-button Tweet
+			div.sb-resizer
+			div.editor
+				div.ed-header
+					div.ed-header-circle
+						i.circle
+					div.ed-header-title
+						span.ed-header-filename
+						span.ed-header-dirname
+					div.ed-header-icon.close
+						i.fa.fa-times(aria-hidden='true')
+				div.ed-textarea-field
+					textarea(spellcheck='false')
+					ul.list
+					div.mirror
+		footer
+			ul.ft-left
+				li Mimorisuzu Code Created by @mimorisuzuko
+			ul.ft-right
+				li
+		div.file-selector
+		script(src='index.js')
