@@ -598,7 +598,8 @@ class Navbar {
 		const current = this.items[index];
 		const previous = this.items[this.itemIndex];
 		if (current === previous) {
-			this.code.sidebar[current[0].classList.toggle('current') ? 'show' : 'hide']();
+			const visible = current[0].classList.toggle('current');
+			this.code.sidebar[visible ? 'show' : 'hide']();
 		} else {
 			_.forEach(previous, (a) => a.classList.remove('current'));
 			_.forEach(current, (a) => a.classList.add('current'));
@@ -903,6 +904,7 @@ class SBTwitter extends SBItem {
 			const $li = document.createElement('li');
 			const $tweetButton = document.createElement('a', 'button');
 			$tweetButton.innerText = 'Tweet';
+			$tweetButton.addEventListener('click', this.tweetByClick.bind(this));
 			const $field = document.createElement('m-twitter-field');
 			$field.src = iconURL;
 			$field.name = name;
@@ -927,7 +929,7 @@ class SBTwitter extends SBItem {
 				this.code.notification.yo({ message: content });
 			}
 		} else {
-			this.code.notification.yo({ message: 'There is no file to tweet.' });
+			this.code.notification.yo({ type: 'error', message: 'There is no file to tweet.' });
 		}
 	}
 }
