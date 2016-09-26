@@ -387,8 +387,8 @@ class Notification {
 
 		this.code = code;
 		this.element = element;
-		this.type = element.querySelector('.nt-type');
-		this.message = element.querySelector('.nt-message');
+		this.$type = element.querySelector('.nt-type');
+		this.$message = element.querySelector('.nt-message');
 		this.button = button;
 
 		this.hide();
@@ -399,8 +399,10 @@ class Notification {
 	 * @param {{type: String, message: String}} opts
 	 */
 	yo(opts) {
-		this.type.innerText = opts.type || 'info';
-		this.message.innerText = opts.message;
+		const {type, message} = opts;
+		this.$type.innerText = type || 'info';
+		this.$type.classList[type === 'error' ? 'add' : 'remove']('error');
+		this.$message.innerText = message;
 		this.show();
 	}
 

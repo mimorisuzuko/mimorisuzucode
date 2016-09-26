@@ -99,6 +99,8 @@ ul {
       margin-right: 10px;
       font-size: 11px;
       text-transform: capitalize; }
+      .notification .nt-left .nt-type.error {
+        background-color: #be1100; }
     .notification .nt-left .nt-message {
       font-size: 12px; }
   .notification .nt-right {
