@@ -1,7 +1,12 @@
 $pink: rgb(233, 30, 99);
+$dpink: darken($pink, 10);
 $white: rgb(212, 212, 212);
 $black: rgb(30, 30, 30);
-$sb-black: rgb(37, 37, 38);
+$black37: rgb(37, 37, 38);
+$black44: rgb(42, 45, 46);
+$black55: rgb(55, 55, 55);
+$black51: rgb(51, 51, 51);
+$black65: rgb(63, 63, 70);
 
 $footer-height: 22px;
 $ed-header-height: 35px;
@@ -41,10 +46,6 @@ footer {
 	ul {
 		@extend .clear;
 
-		margin: 0;
-		padding: 0;
-		list-style: none;
-
 		&.ft-left {
 			float: left;
 		}
@@ -65,6 +66,12 @@ footer {
 	}
 }
 
+ul {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
 .shadow {
 	box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15);
 }
@@ -80,19 +87,16 @@ footer {
 	}
 }
 
-.twitter-icon {
-	border-radius: 7px;
-	width: 72px;
-}
-
-.twitter-name {
-	color: white;
-}
-
 .sub-title {
 	opacity: 0.7;
 	margin-left: 0.5em;
 	font-size: 0.9em;
+}
+
+.ellipsis {
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	overflow: hidden;
 }
 
 .circle {
@@ -132,7 +136,7 @@ footer {
 	left: 0;
 	right: 0;
 	top: 0;
-	background-color: rgb(55, 55, 55);
+	background-color: $black55;
 	line-height: 35px;
 	width: 70%;
 	box-sizing: border-box;
@@ -172,7 +176,7 @@ footer {
 			display: inline-block;
 			color: white;
 			font-size: 12px;
-			background-color: darken($pink, 10);
+			background-color: $dpink;
 			cursor: pointer;
 			text-transform: capitalize;
 
@@ -189,13 +193,9 @@ footer {
 	float: left;
 	width: $navbar-width;
 	height: 100%;
-	background-color: rgb(51, 51, 51);
+	background-color: $black51;
 
 	ul {
-		list-style: none;
-		margin: 0;
-		padding: 0;
-
 		li {
 			font-size: 1.6rem;
 			text-align: center;
@@ -218,11 +218,54 @@ footer {
 	// sb-
 
 	float: left;
-	background-color: rgb(37, 37, 38);
+	background-color: $black37;
 	height: 100%;
 	overflow: hidden;
 	font-size: 11px;
 	-webkit-user-select: none;
+
+	li {
+		cursor: pointer;
+		font-size: 13px;
+	}
+
+	.header {
+		line-height: 35px;
+		padding-left: 20px;
+		text-transform: uppercase;
+		overflow-x: hidden;
+	}
+
+	.content {
+		padding: 0 20px;
+		font-size: 13px;
+	}
+
+	.explorer {
+		li {
+			@extend .sb-line;
+
+			overflow-x: hidden;
+
+			&:hover {
+				background-color: $black44;
+			}
+
+			&.current {
+				background-color: $black65;
+			}
+		}
+	}
+
+	.twitter {
+		li {
+			padding: 4px 11px 4px 16px;
+
+			&:hover {
+				background-color: $black55;
+			}
+		}
+	}
 
 	.sb-item {
 		height: 100%;
@@ -238,24 +281,14 @@ footer {
 		white-space: nowrap;
 	}
 
-	.sb-header {
-		line-height: 35px;
-		padding-left: 20px;
-		text-transform: uppercase;
-		overflow-x: hidden;
-	}
-
 	.sb-sub-header {
-		@extend .sb-line;
+		@extend .sb-line, .ellipsis;
 
 		font-weight: 700;
 		text-transform: uppercase;
-		background-color: rgb(55, 55, 55);
+		background-color: $black55;
 		cursor: pointer;
 		width: 100%;
-		white-space: nowrap;
-		text-overflow: ellipsis;
-		overflow: hidden;
 	}
 
 	.sb-wrap-icon {
@@ -309,7 +342,7 @@ footer {
 		padding: 4px;
 		line-height: 1.4em;
 		cursor: pointer;
-		background-color: darken($pink, 10);
+		background-color: $pink;
 		width: 100%;
 		display: inline-block;
 		box-sizing: border-box;
@@ -318,33 +351,6 @@ footer {
 
 		&:hover {
 			background-color: $pink;
-		}
-	}
-
-	.sb-twitter-content {
-		padding: 0 20px;
-		font-size: 13px;
-	}
-
-	ul {
-		margin: 0;
-		padding: 0;
-		list-style: none;
-	}
-
-	li {
-		@extend .sb-line;
-
-		overflow-x: hidden;
-		cursor: pointer;
-		font-size: 13px;
-
-		&:hover {
-			background-color: rgb(42, 45, 46);
-		}
-
-		&.current {
-			background-color: rgb(63, 63, 70);
 		}
 	}
 }
@@ -385,10 +391,9 @@ footer {
 		}
 
 		.ed-header-title {
-			overflow: hidden;
-			white-space: nowrap;
+			@extend .ellipsis;
+
 			width: 100%;
-			text-overflow: ellipsis;
 		}
 
 		.ed-header-dirname {
@@ -467,5 +472,53 @@ footer {
 	.ed-hl {
 		color: $pink;
 		font-weight: bold;
+	}
+}
+
+m-twitter-field {
+	@extend .clear;
+
+	$width: 60px;
+	$margin-left: 7px;
+
+	display: block;
+	color: white;
+	font-size: 13px;
+
+	[is='left'] {
+		width: $width;
+		float: left;
+
+		img {
+			display: block;
+			width: 100%;
+			border-radius: 7px;
+		}
+	}
+
+	[is='right'] {
+		width: calc(100% - #{$width + $margin-left});
+		float: left;
+		margin-left: $margin-left;
+
+		header {
+			@extend .ellipsis;
+
+			:nth-child(2) {
+				@extend .sub-title;
+			}
+		}
+
+		[is='content'] {
+			[is='button'] {
+				display: inline-block;
+				background-color: $dpink;
+				padding: 0 5px;
+
+				&:hover {
+					background-color: $pink;
+				}
+			}
+		}
 	}
 }

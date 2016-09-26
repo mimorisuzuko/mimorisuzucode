@@ -62,6 +62,53 @@ class MFile {
 	}
 }
 
+class HTMLTwitterField extends HTMLElement {
+	createdCallback() {
+		const $left = document.createElement('div', 'left');
+		const $img = document.createElement('img');
+		$left.appendChild($img);
+
+		const $right = document.createElement('div', 'right');
+		const $header = document.createElement('header');
+		const $name = document.createElement('span');
+		const $sname = document.createElement('span');
+		_.forEach([$name, $sname], (a) => $header.appendChild(a));
+		const $content = document.createElement('div', 'content');
+		_.forEach([$header, $content], (a) => $right.appendChild(a));
+
+		_.forEach([$left, $right], (a) => this.appendChild(a));
+
+		this.$img = $img;
+		this.$name = $name;
+		this.$sname = $sname;
+		this.$content = $content;
+	}
+
+	attributeChangedCallback(name, previous, current) {
+	}
+
+	set src(src) {
+		this.setAttribute('m-src', src);
+		this.$img.src = src;
+	}
+
+	set name(name) {
+		this.setAttribute('m-name', name);
+		this.$name.innerText = name;
+	}
+
+	set sname(sname) {
+		this.setAttribute('m-sname', sname);
+		this.$sname.innerText = `@${sname}`;
+	}
+
+	static get observedAttributes() {
+		return ['m-src', 'm-name', 'm-sname'];
+	}
+}
+
+document.registerElement('m-twitter-field', HTMLTwitterField);
+
 class Code {
 	constructor() {
 		const element = document.querySelector('.editor');
@@ -93,10 +140,7 @@ class Code {
 		this.sidebar.hide();
 
 		// For debug
-		//const home = nodepath.join(__dirname, '../');
-		//const {type, results, basename} = ipcRenderer.sendSync('open', { path: home });
-		//this.sidebar.explorer.setWorkspace(basename, results);
-		//this.openEditor(nodepath.join(home, 'test-files/tweet0.txt'));
+		this.navbar.items[1][0].click();
 	}
 
 	/**
@@ -703,19 +747,19 @@ class SBExplorer extends SBItem {
 	constructor(code) {
 		super(code);
 
-		const element = document.querySelector('.sb-explorer');
+		const $element = document.querySelector('.explorer');
 
-		this.element = element;
-		this.dirname = element.querySelector('.sb-dirname');
-		this.directoryTree = element.querySelector('.sb-directory-tree');
+		this.element = $element;
+		this.dirname = $element.querySelector('.sb-dirname');
+		this.directoryTree = $element.querySelector('.sb-directory-tree');
 		this.directoryTreeList = this.directoryTree.querySelector('ul');
-		this.editorTree = element.querySelector('.sb-editor-tree');
+		this.editorTree = $element.querySelector('.sb-editor-tree');
 		this.editorTreeList = this.editorTree.querySelector('ul');
 		this.tailElement = this.directoryTree;
 
 		this.__savedElements__ = {};
-		_.forEach(element.querySelectorAll('.sb-sub-header'), (sh) => sh.addEventListener('click', () => {
-			const target = this.__savedElements__[sh.dataset.target] || element.querySelector(sh.dataset.target);
+		_.forEach($element.querySelectorAll('.sb-sub-header'), (sh) => sh.addEventListener('click', () => {
+			const target = this.__savedElements__[sh.dataset.target] || $element.querySelector(sh.dataset.target);
 			target.style.display = sh.classList.toggle('selected') ? '' : 'none';
 		}));
 	}
@@ -849,37 +893,28 @@ class SBTwitter extends SBItem {
 	constructor(code) {
 		super(code);
 
-		const $element = document.querySelector('.sb-twitter');
-		//$element.querySelector('.sb-button').addEventListener('click', this.click.bind(this));
-		const $content = $element.querySelector('.sb-twitter-content');;
+		const $element = document.querySelector('.twitter');
+		const $ul = $element.querySelector('ul');
 		const settings = ipcRenderer.sendSync('twitter-settings');
-		_.forEach(_.values(settings), ({iconURL, name, screenName}) => {
-			const $center = document.createElement('center');
-			const $img = document.createElement('img');
-			$img.classList.add('twitter-icon');
-			$img.src = iconURL;
-			const $p = document.createElement('p');
-			const $name = document.createElement('span');
-			$name.classList.add('twitter-name');
-			$name.innerText = name;
-			const $screenName = document.createElement('span');
-			$screenName.classList.add('twitter-screen-name');
-			$screenName.innerText = screenName;
-			_.forEach([$name, document.createElement('br'), $screenName], (a) => $p.appendChild(a));
-			const $button = document.createElement('a');
-			$button.classList.add('sb-button');
-			$button.innerText = 'Tweet';
-			$button.addEventListener('click', this.click.bind(this));
 
-			_.forEach([$img, $p, $button], (a) => $center.appendChild(a));
-			$content.appendChild($center);
+		_.forEach(_.values(settings), ({iconURL, name, screenName}) => {
+			const $li = document.createElement('li');
+			const $tweetButton = document.createElement('a', 'button');
+			$tweetButton.innerText = 'Tweet';
+			const $field = document.createElement('m-twitter-field');
+			$field.src = iconURL;
+			$field.name = name;
+			$field.sname = screenName;
+			_.forEach([$tweetButton], (a) => $field.$content.appendChild(a));
+			$li.appendChild($field);
+			$ul.appendChild($li);
 		});
 
 		this.element = $element;
-		this.tailElement = $content;
+		this.tailElement = $ul;
 	}
 
-	click() {
+	tweetByClick() {
 		const {file} = this.code;
 		if (file) {
 			file.save();

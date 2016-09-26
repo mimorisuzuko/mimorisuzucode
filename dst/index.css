@@ -18,25 +18,26 @@ footer {
   font-size: 12px;
   padding: 0 10px;
   line-height: 22px; }
-  footer ul {
-    margin: 0;
-    padding: 0;
-    list-style: none; }
-    footer ul.ft-left {
-      float: left; }
-    footer ul.ft-right {
-      float: right; }
-    footer ul li {
-      float: left;
-      padding: 0 5px;
-      cursor: pointer; }
-      footer ul li:hover {
-        background-color: rgba(255, 255, 255, 0.1); }
+  footer ul.ft-left {
+    float: left; }
+  footer ul.ft-right {
+    float: right; }
+  footer ul li {
+    float: left;
+    padding: 0 5px;
+    cursor: pointer; }
+    footer ul li:hover {
+      background-color: rgba(255, 255, 255, 0.1); }
+
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none; }
 
 .shadow, .notification, .editor .ed-header, .editor .list {
   box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15); }
 
-.clear::after, main::after, footer::after, footer ul::after, .notification::after {
+.clear::after, main::after, footer::after, footer ul::after, .notification::after, m-twitter-field::after {
   display: block;
   font-size: 0;
   content: '.';
@@ -44,17 +45,15 @@ footer {
   height: 0;
   clear: both; }
 
-.twitter-icon {
-  border-radius: 7px;
-  width: 72px; }
-
-.twitter-name {
-  color: white; }
-
-.sub-title, .editor .ed-header .ed-header-dirname {
+.sub-title, .editor .ed-header .ed-header-dirname, m-twitter-field [is='right'] header :nth-child(2) {
   opacity: 0.7;
   margin-left: 0.5em;
   font-size: 0.9em; }
+
+.ellipsis, .sidebar .sb-sub-header, .editor .ed-header .ed-header-title, m-twitter-field [is='right'] header {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden; }
 
 .circle {
   width: 8px;
@@ -122,20 +121,16 @@ footer {
   width: 50px;
   height: 100%;
   background-color: #333333; }
-  .navbar ul {
-    list-style: none;
-    margin: 0;
-    padding: 0; }
-    .navbar ul li {
-      font-size: 1.6rem;
-      text-align: center;
-      margin: 10px 0;
-      line-height: 40px;
-      cursor: pointer; }
-      .navbar ul li.current {
-        color: white; }
-      .navbar ul li:hover {
-        color: white; }
+  .navbar ul li {
+    font-size: 1.6rem;
+    text-align: center;
+    margin: 10px 0;
+    line-height: 40px;
+    cursor: pointer; }
+    .navbar ul li.current {
+      color: white; }
+    .navbar ul li:hover {
+      color: white; }
 
 .sidebar {
   float: left;
@@ -144,28 +139,41 @@ footer {
   overflow: hidden;
   font-size: 11px;
   -webkit-user-select: none; }
+  .sidebar li {
+    cursor: pointer;
+    font-size: 13px; }
+  .sidebar .header {
+    line-height: 35px;
+    padding-left: 20px;
+    text-transform: uppercase;
+    overflow-x: hidden; }
+  .sidebar .content {
+    padding: 0 20px;
+    font-size: 13px; }
+  .sidebar .explorer li {
+    overflow-x: hidden; }
+    .sidebar .explorer li:hover {
+      background-color: #2a2d2e; }
+    .sidebar .explorer li.current {
+      background-color: #3f3f46; }
+  .sidebar .twitter li {
+    padding: 4px 11px 4px 16px; }
+    .sidebar .twitter li:hover {
+      background-color: #373737; }
   .sidebar .sb-item {
     height: 100%;
     display: none; }
     .sidebar .sb-item.current {
       display: block; }
-  .sidebar .sb-line, .sidebar .sb-sub-header, .sidebar li {
+  .sidebar .sb-line, .sidebar .explorer li, .sidebar .sb-sub-header {
     line-height: 22px;
     white-space: nowrap; }
-  .sidebar .sb-header {
-    line-height: 35px;
-    padding-left: 20px;
-    text-transform: uppercase;
-    overflow-x: hidden; }
   .sidebar .sb-sub-header {
     font-weight: 700;
     text-transform: uppercase;
     background-color: #373737;
     cursor: pointer;
-    width: 100%;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden; }
+    width: 100%; }
   .sidebar .sb-wrap-icon {
     width: 16px;
     text-align: center;
@@ -193,7 +201,7 @@ footer {
     padding: 4px;
     line-height: 1.4em;
     cursor: pointer;
-    background-color: #c1134e;
+    background-color: #e91e63;
     width: 100%;
     display: inline-block;
     box-sizing: border-box;
@@ -201,21 +209,6 @@ footer {
     text-align: center; }
     .sidebar .sb-button:hover {
       background-color: #e91e63; }
-  .sidebar .sb-twitter-content {
-    padding: 0 20px;
-    font-size: 13px; }
-  .sidebar ul {
-    margin: 0;
-    padding: 0;
-    list-style: none; }
-  .sidebar li {
-    overflow-x: hidden;
-    cursor: pointer;
-    font-size: 13px; }
-    .sidebar li:hover {
-      background-color: #2a2d2e; }
-    .sidebar li.current {
-      background-color: #3f3f46; }
 
 .sb-resizer {
   position: absolute;
@@ -244,10 +237,7 @@ footer {
       display: inline-block;
       text-align: center; }
     .editor .ed-header .ed-header-title {
-      overflow: hidden;
-      white-space: nowrap;
-      width: 100%;
-      text-overflow: ellipsis; }
+      width: 100%; }
     .editor .ed-header .ed-header-icon {
       width: 28px;
       margin-right: 0.3em;
@@ -301,3 +291,25 @@ footer {
   .editor .ed-hl {
     color: #e91e63;
     font-weight: bold; }
+
+m-twitter-field {
+  display: block;
+  color: white;
+  font-size: 13px; }
+  m-twitter-field [is='left'] {
+    width: 60px;
+    float: left; }
+    m-twitter-field [is='left'] img {
+      display: block;
+      width: 100%;
+      border-radius: 7px; }
+  m-twitter-field [is='right'] {
+    width: calc(100% - 67px);
+    float: left;
+    margin-left: 7px; }
+    m-twitter-field [is='right'] [is='content'] [is='button'] {
+      display: inline-block;
+      background-color: #c1134e;
+      padding: 0 5px; }
+      m-twitter-field [is='right'] [is='content'] [is='button']:hover {
+        background-color: #e91e63; }
