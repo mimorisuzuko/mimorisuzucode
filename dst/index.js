@@ -849,15 +849,34 @@ class SBTwitter extends SBItem {
 	constructor(code) {
 		super(code);
 
-		const element = document.querySelector('.sb-twitter');
-		element.querySelector('.sb-button').addEventListener('click', this.click.bind(this));
-		const {iconURL, name, screenName} = ipcRenderer.sendSync('twitter-settings');
-		document.querySelector('.twitter-icon').src = iconURL;
-		document.querySelector('.twitter-name').innerText = name;
-		document.querySelector('.twitter-screen-name').innerText = `@${screenName}`;
+		const $element = document.querySelector('.sb-twitter');
+		//$element.querySelector('.sb-button').addEventListener('click', this.click.bind(this));
+		const $content = $element.querySelector('.sb-twitter-content');;
+		const settings = ipcRenderer.sendSync('twitter-settings');
+		_.forEach(_.values(settings), ({iconURL, name, screenName}) => {
+			const $center = document.createElement('center');
+			const $img = document.createElement('img');
+			$img.classList.add('twitter-icon');
+			$img.src = iconURL;
+			const $p = document.createElement('p');
+			const $name = document.createElement('span');
+			$name.classList.add('twitter-name');
+			$name.innerText = name;
+			const $screenName = document.createElement('span');
+			$screenName.classList.add('twitter-screen-name');
+			$screenName.innerText = screenName;
+			_.forEach([$name, document.createElement('br'), $screenName], (a) => $p.appendChild(a));
+			const $button = document.createElement('a');
+			$button.classList.add('sb-button');
+			$button.innerText = 'Tweet';
+			$button.addEventListener('click', this.click.bind(this));
 
-		this.element = element;
-		this.tailElement = this.element.querySelector('.sb-twitter-content');
+			_.forEach([$img, $p, $button], (a) => $center.appendChild(a));
+			$content.appendChild($center);
+		});
+
+		this.element = $element;
+		this.tailElement = $content;
 	}
 
 	click() {

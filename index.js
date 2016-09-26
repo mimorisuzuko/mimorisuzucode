@@ -18,10 +18,9 @@ const tapi = new TwitterAPI({
 });
 const IGNORED_FILES = ['.DS_Store'];
 const template = require('./menu');
+const tkeys = fs.existsSync('twitter-keys.json') ? require('./twitter-keys.json') : {};
 const dst = `file://${__dirname}/dst/index.html`;
-
-let twitter = null;
-let twitterSettings = {};
+const twitterSettings = {};
 
 /**
  * Create the window
@@ -61,38 +60,75 @@ const createWindow = (hasVerified) => {
 	});
 };
 
+/**
+ * Get id, screen name, icon url and name from Twitter account/verify_credentials. 
+ * @param {Twitter} twitter
+ * @returns {Promise}
+ */
+const getTwitterSettings = (twitter) => new Promise((resolve, reject) => {
+	twitter.get('account/verify_credentials', (err, d) => {
+		if (err) { reject(err); }
+
+		const id = d.id_str;
+		const screenName = d.screen_name;
+		const iconURL = d.profile_image_url.replace(/_normal/, '');
+		const name = d.name;
+
+		resolve({ id, screenName, iconURL, name });
+	});
+});
+
 app.on('ready', () => {
+	const menu = Menu.buildFromTemplate(template);
+	Menu.setApplicationMenu(menu);
+
 	co(function* () {
-		const {accessToken, accessTokenSecret, mainWindow} = yield createWindow();
+		const pairs = _.toPairs(tkeys);
+		const pairsLength = pairs.length;
+		if (pairsLength) {
+			for (let i = 0; i < pairsLength; i += 1) {
+				const [id, {accessToken, accessTokenSecret}] = pairs[i];
+				const twitter = new Twitter({
+					consumer_key: config.consumerKey,
+					consumer_secret: config.consumerSecret,
+					access_token_key: accessToken,
+					access_token_secret: accessTokenSecret
+				});
+				const {iconURL, name, screenName} = yield getTwitterSettings(twitter);
+				twitterSettings[id] = {
+					iconURL,
+					name,
+					screenName,
+					twitter
+				};
+			}
 
-		twitter = new Twitter({
-			consumer_key: config.consumerKey,
-			consumer_secret: config.consumerSecret,
-			access_token_key: accessToken,
-			access_token_secret: accessTokenSecret
-		});
+			const {mainWindow} = yield createWindow(true);
+			mainWindow.loadURL(dst);
+		} else {
+			const {accessToken, accessTokenSecret, mainWindow} = yield createWindow();
 
-		const screenName = yield new Promise((resolve, reject) => {
-			twitter.get('account/settings', (err, settings, res) => {
-				if (err) { reject(err); }
-				resolve(settings.screen_name);
+			const twitter = new Twitter({
+				consumer_key: config.consumerKey,
+				consumer_secret: config.consumerSecret,
+				access_token_key: accessToken,
+				access_token_secret: accessTokenSecret
 			});
-		});
 
-		const {iconURL, name} = yield new Promise((resolve, reject) => {
-			twitter.get('users/show', { screen_name: screenName }, (err, show, res) => {
-				if (err) { reject(err); }
-				const {profile_image_url, name} = show;
-				const iconURL = profile_image_url.replace(/_normal/, '');
-				resolve({ iconURL, name });
-			});
-		});
+			const {id, screenName, iconURL, name} = yield getTwitterSettings(twitter);
 
-		twitterSettings = { iconURL, name, screenName };
-		mainWindow.loadURL(dst);
+			tkeys[id] = { accessToken, accessTokenSecret };
+			fs.writeFileSync('twitter-keys.json', JSON.stringify(tkeys, null, '\t'));
 
-		const menu = Menu.buildFromTemplate(template);
-		Menu.setApplicationMenu(menu);
+			twitterSettings[id] = {
+				iconURL,
+				name,
+				screenName,
+				twitter
+			};
+
+			mainWindow.loadURL(dst);
+		}
 	}).catch((err) => { throw new Error(err); });
 });
 
