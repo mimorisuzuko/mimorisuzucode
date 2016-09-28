@@ -19,45 +19,57 @@ const tapi = new TwitterAPI({
 const IGNORED_FILES = ['.DS_Store'];
 const template = require('./menu');
 const tkeys = fs.existsSync('twitter-keys.json') ? require('./twitter-keys.json') : {};
-const dst = `file://${__dirname}/dst/index.html`;
 const twitterSettings = {};
 
 /**
- * Create the window
- * @param {Boolean} hasVerified
+ * Create the window to verify Twitte account
  * @returns {Promise}
  */
-const createWindow = (hasVerified) => {
-	const size = electron.screen.getPrimaryDisplay().workAreaSize;
-	const mainWindow = new BrowserWindow({
-		width: size.width, height: size.height,
+const getAccessToken = () => {
+	const browserWindow = new BrowserWindow({
 		webPreferences: { webSecurity: false }
 	});
 
 	return new Promise((resolve, reject) => {
-		if (hasVerified) {
-			resolve({ mainWindow });
-		} else {
-			tapi.getRequestToken((err, requestToken, requestTokenSecret, results) => {
-				if (err) { reject(err); }
+		browserWindow.on('close', () => {
+			browserWindow.webContents.session.clearStorageData();
+			resolve(null);
+		});
 
-				const aurl = tapi.getAuthUrl(requestToken);
-				mainWindow.webContents.on('will-navigate', (event, url) => {
-					event.preventDefault();
-					const oauthVerifier = qs.parse(_.split(url, '?')[1]).oauth_verifier;
-					tapi.getAccessToken(requestToken, requestTokenSecret, oauthVerifier, (err, accessToken, accessTokenSecret, results) => {
+		tapi.getRequestToken((err, requestToken, requestTokenSecret, results) => {
+			if (err) { reject(err); }
+
+			const aurl = tapi.getAuthUrl(requestToken);
+			browserWindow.webContents.on('will-navigate', (event, url) => {
+				event.preventDefault();
+				const oauthVerifier = qs.parse(_.split(url, '?')[1]).oauth_verifier;
+				tapi.getAccessToken(requestToken, requestTokenSecret, oauthVerifier, (err, accessToken, accessTokenSecret, results) => {
+					if (err) { reject(err); }
+
+					tapi.verifyCredentials(accessToken, accessTokenSecret, {}, (error, data, res) => {
 						if (err) { reject(err); }
-
-						tapi.verifyCredentials(accessToken, accessTokenSecret, {}, (error, data, res) => {
-							if (err) { reject(err); }
-							resolve({ accessToken, accessTokenSecret, mainWindow });
-						});
+						resolve({ accessToken, accessTokenSecret });
+						browserWindow.close();
 					});
 				});
-				mainWindow.loadURL(aurl);
 			});
-		}
+			browserWindow.loadURL(aurl);
+		});
+
 	});
+};
+
+/**
+ * Create the window
+ * @returns {BrowserWindow}
+ */
+const createMainWindow = () => {
+	const size = electron.screen.getPrimaryDisplay().workAreaSize;
+	const browserWindow = new BrowserWindow({
+		width: size.width, height: size.height,
+	});
+	browserWindow.loadURL(`file://${__dirname}/dst/index.html`);
+	return browserWindow;
 };
 
 /**
@@ -79,14 +91,11 @@ const getTwitterSettings = (twitter) => new Promise((resolve, reject) => {
 });
 
 app.on('ready', () => {
-	const menu = Menu.buildFromTemplate(template);
-	Menu.setApplicationMenu(menu);
-
 	co(function* () {
 		const pairs = _.toPairs(tkeys);
-		const pairsLength = pairs.length;
-		if (pairsLength) {
-			for (let i = 0; i < pairsLength; i += 1) {
+		const {length} = pairs;
+		if (length) {
+			for (let i = 0; i < length; i += 1) {
 				const [id, {accessToken, accessTokenSecret}] = pairs[i];
 				const twitter = new Twitter({
 					consumer_key: config.consumerKey,
@@ -102,34 +111,31 @@ app.on('ready', () => {
 					twitter
 				};
 			}
-
-			const {mainWindow} = yield createWindow(true);
-			mainWindow.loadURL(dst);
 		} else {
-			const {accessToken, accessTokenSecret, mainWindow} = yield createWindow();
-
-			const twitter = new Twitter({
-				consumer_key: config.consumerKey,
-				consumer_secret: config.consumerSecret,
-				access_token_key: accessToken,
-				access_token_secret: accessTokenSecret
-			});
-
-			const {id, screenName, iconURL, name} = yield getTwitterSettings(twitter);
-
-			tkeys[id] = { accessToken, accessTokenSecret };
-			fs.writeFileSync('twitter-keys.json', JSON.stringify(tkeys, null, '\t'));
-
-			twitterSettings[id] = {
-				iconURL,
-				name,
-				screenName,
-				twitter
-			};
-
-			mainWindow.loadURL(dst);
+			const hasVerified = yield getAccessToken();
+			if (hasVerified) {
+				const {accessToken, accessTokenSecret} = hasVerified;
+				const twitter = new Twitter({
+					consumer_key: config.consumerKey,
+					consumer_secret: config.consumerSecret,
+					access_token_key: accessToken,
+					access_token_secret: accessTokenSecret
+				});
+				const {id, screenName, iconURL, name} = yield getTwitterSettings(twitter);
+				tkeys[id] = { accessToken, accessTokenSecret };
+				fs.writeFileSync('twitter-keys.json', JSON.stringify(tkeys, null, '\t'));
+				twitterSettings[id] = {
+					iconURL,
+					name,
+					screenName,
+					twitter
+				};
+			}
 		}
-	}).catch((err) => { throw new Error(err); });
+		const menu = Menu.buildFromTemplate(template);
+		Menu.setApplicationMenu(menu);
+		createMainWindow();
+	}).catch((err) => console.log(err));
 });
 
 app.on('window-all-closed', () => {
@@ -138,10 +144,7 @@ app.on('window-all-closed', () => {
 
 app.on('activate', () => {
 	if (BrowserWindow.getFocusedWindow()) { return; }
-	co(function* () {
-		const {mainWindow} = yield createWindow(true);
-		mainWindow.loadURL(dst);
-	});
+	createMainWindow();
 });
 
 /**
